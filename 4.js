@@ -1,17 +1,15 @@
 // 手写 throttle
-
 function throttle(func, wait) {
-  let waiting = false
-  let lastArgs = []
-  return function (...args) {
+  let waiting = false, lastArgs
+  return function(...args) {
+    lastArgs = args
     if (!waiting) {
       waiting = true
-      func.apply(this, args)
+      func(...args)
       setTimeout(() => {
-        func.apply(this, lastArgs.length ? lastArgs : args)
+        waiting = false
+        func(...lastArgs)
       }, wait)
-    } else {
-      lastArgs = args
     }
   }
 }
@@ -23,6 +21,7 @@ const run = (input) => {
 
   const func = (arg) => {
      calls.push(`${arg}@${currentTime}`)
+     console.log(calls)
   }
 
   const throttled = throttle(func, 3)
@@ -33,5 +32,5 @@ const run = (input) => {
   return calls
 }
 let runner = run(['A@0', 'B@2', 'C@3'])
-console.log(runner)
+
 // expect(run(['A@0', 'B@2', 'C@3'])).toEqual(['A@0', 'C@3'])
