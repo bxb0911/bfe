@@ -5,14 +5,11 @@ function throttle(func, wait) {
     if (!waiting) {
       waiting = true
       func.apply(this, args)
-      console.log('call args', args)
       setTimeout(() => {
         waiting = false
-        console.log('call inner args', args)
         lastArgs && func.apply(this, lastArgs)
       }, wait)
     } else {
-      console.log('update args', args)
       lastArgs = args
     }
   }
@@ -22,7 +19,6 @@ let currentTime = 0
 const run = (input) => {
   currentTime = 0
   const calls = []
-
   const func = (arg) => {
      calls.push(`${arg}@${currentTime}`)
      console.log(calls)
