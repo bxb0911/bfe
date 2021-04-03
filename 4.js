@@ -2,14 +2,15 @@
 function throttle(func, wait) {
   let waiting = false, lastArgs
   return function(...args) {
-    lastArgs = args
     if (!waiting) {
       waiting = true
-      func(...args)
+      func.apply(this, args)
       setTimeout(() => {
         waiting = false
-        func(...lastArgs)
+        lastArgs && func.apply(this, lastArgs)
       }, wait)
+    } else {
+      lastArgs = args
     }
   }
 }
@@ -18,7 +19,6 @@ let currentTime = 0
 const run = (input) => {
   currentTime = 0
   const calls = []
-
   const func = (arg) => {
      calls.push(`${arg}@${currentTime}`)
      console.log(calls)
@@ -31,6 +31,6 @@ const run = (input) => {
   })
   return calls
 }
-let runner = run(['A@0', 'B@2', 'C@3'])
+let runner = run(['A@0', 'B@1', 'C@2', 'D@3', 'E@4', 'F@5', 'G@6'])
 
 // expect(run(['A@0', 'B@2', 'C@3'])).toEqual(['A@0', 'C@3'])
