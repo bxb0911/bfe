@@ -9,13 +9,28 @@ const REJECTED = 'rejected'
 
 class MPromise {
   constructor(executor) {
-    if (typeof executor !== 'function') return
     this.status = PENDING
     this.value = null
     this.reason = null
     this.fullfilledQueue = []
     this.rejectedQueue = []
-    executor(this.resolve.bind(this), this.reject.bind(this))
+    try {
+      typeof executor === 'function' && executor(this.resolve.bind(this), this.reject.bind(this))
+    } catch (e) {
+      this.reject(e)
+    }
+  }
+
+  static resolve(value = null) {
+    let promise = new MPromise()
+    promise.resolve(value)
+    return promise
+  }
+
+  static reject(reason=null) {
+    let promise = new MPromise()
+    promise.reject(reason)
+    return promise
   }
 
   resolve(value) {
@@ -51,41 +66,52 @@ class MPromise {
   }
 
   then(onFullfilled, onRejected) {
+    debugger
+    let fullfilledRes, rejectedRes
     try {
       if (typeof onFullfilled === 'function') {
-        this.status === FULLFILLED && onFullfilled(this.value)   
         this.status === PENDING && this.fullfilledQueue.push(onFullfilled)
+        if (this.status === FULLFILLED) {
+          // todo
+          // queueMicrotask(() => {
+          //   fullfilledRes = onFullfilled(this.value)
+          //   if (typeof fullfilledRes === 'undefined') {
+          //     throw new TypeError('UnhandledPromiseRejectionWarning: TypeError: Chaining cycle detected for promise #<Promise>')
+          //   }
+          // })
+          fullfilledRes = onFullfilled(this.value)
+          if (fullfilledRes instanceof MPromise) {
+            return fullfilledRes
+          }
+        }
       }
       if (typeof onRejected === 'function') {
-        this.status === REJECTED && onRejected(this.reason)
         this.status === PENDING && this.rejectedQueue.push(onRejected)
+        if (this.status === REJECTED) {
+          rejectedRes = onRejected(this.reason)
+          if (rejectedRes instanceof MPromise) {
+            return rejectedRes
+          }
+        }
       }
-    } catch(e) {
-      onRejected(e)
+      return this
+    } catch (e) {
+      this.status = REJECTED
+      this.reason = e
     }
   }
 }
 
-const promise = new MPromise((resolve, reject) => {
-  setTimeout(() => {
-    resolve('success')
-  }, 2000); 
-})
+MPromise.deferred = function () {
+  var result = {}
+  result.promise = new MPromise(function (resolve, reject) {
+    result.resolve = resolve
+    result.reject = reject
+  })
+  return result
+}
 
-promise.then(value => {
-  console.log(1)
-  console.log('resolve', value)
-})
- 
-promise.then(value => {
-  console.log(2)
-  console.log('resolve', value)
-})
-
-promise.then(value => {
-  console.log(3)
-  console.log('resolve', value)
-})
+module.exports = MPromise
 
 // MPromise.resolve().then(() => {
 //   console.log(0);
