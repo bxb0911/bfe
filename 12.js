@@ -67,6 +67,6 @@ function update(data, command) {
   } else if (key === '$merge') {
     return { ...data, ...objChecker(command) }
   } else if (key === '$apply') {
-    return [ ...data,  ]
+    return [ ...data ]
   }
 }
