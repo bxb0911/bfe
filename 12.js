@@ -1,6 +1,3 @@
-// // update -> push {$push: array}
-// const arr = [1, 2, 3, 4]
-// const newArr = update(arr, {$push: [5, 6]})
 // // update -> set {$set: any}
 // const state = {
 //   a: {
@@ -34,7 +31,7 @@ function arrChecker(arr, commands) {
   }
   return arr
 }
-arrChecker([1,2,3,4], {0: {$set: 0}})
+// arrChecker([1,2,3,4], {0: {$set: 0}})
 // const arr = [1, 2, 3, 4]
 // const newArr = update(
 //   arr, 
@@ -61,12 +58,18 @@ function update(data, command) {
   let key = Object.keys(command)[0]
   let val = command[key]
   if (key === '$push') {
-    return [data, ...val]
-  } else if (key === '$set') {
-    return isObj(data) ? { ...data, ...objChecker(command) } : arrChecker(arr, command)
-  } else if (key === '$merge') {
-    return { ...data, ...objChecker(command) }
-  } else if (key === '$apply') {
-    return [ ...data ]
+    return [...data, ...val]
   }
+  // else if (key === '$set') {
+  //   return isObj(data) ? { ...data, ...objChecker(command) } : arrChecker(arr, command)
+  // } else if (key === '$merge') {
+  //   return { ...data, ...objChecker(command) }
+  // } else if (key === '$apply') {
+
+  // }
 }
+
+// update -> push {$push: array}
+const arr = [1, 2, 3, 4]
+const newArr = update(arr, { $push: [5, 6] })
+console.log(newArr)
