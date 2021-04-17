@@ -3,7 +3,7 @@
 // 调用一次返回一个类名
 // 返回的类名序列需要满足: 先短后长，相同长度按照字母排序（小写字母优先）
 // 同时提供一个reset函数
-
+//// todo 51 aa
 function getUniqueClassName() {
   !getUniqueClassName.index && (getUniqueClassName.index = 0)
   getUniqueClassName.index++
