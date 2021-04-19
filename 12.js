@@ -1,50 +1,45 @@
-// // update -> set {$set: any}
-// const newState = update(
-//   state, 
-//   {a: {b: {c: {$set: 3}}}}
-// )
-// const newState = update(
-//   state, 
-//   {a: {b: { $merge: {e: 5}}}}
-// )
-
-function objChecker(obj, lastObj, lastKey) {
-  for (const [key, val] of Object.entries(obj)) {
-    if (key === '$set' || key === '$merge') {
-      if (key === '$set') {
-        lastObj[lastKey] = objChecker(val, obj, key)
-      } else if (key === '$merge') {
-        delete lastObj[lastKey]['$merge']
-        lastObj[lastKey] = { ...lastObj[lastKey], ...val }
-      }
-      return val
-    }
-  }
-  return obj
-}
-
-const isObj = val => typeof val === 'object' && val !== null
-const getKeys = obj => Object.keys(obj)
+const keyMap = ['$push', '$set', '$merge', '$apply']
 
 function update(data, command) {
-  let key = getKeys(command)[0]
-  let val = command[key]
-  if (key === '$push') {
-    return [...data, ...val]
-  } else if (Array.isArray(data)) {
-    getKeys(val).forEach(item => {
-      if (item === '$set') {
-        data[key] = val[item]
-      } else if (item === '$apply') {
-        data[key] = val[item](data[key])
+  return walk(data, command)
+}
+const arr = [1, 2, 3, 4]
+const newArr = update(
+  arr, 
+  {0: {$set: 0}}
+)
+function walk(data, command, pdata, pkey) {
+  for (let k in command) {
+    if (keyMap.indexOf(k) !== -1) {
+      switch (k) {
+        case '$push':
+          if (Array.isArray(data)) {
+            data.push(...command[k])
+          } else {
+            throw 'Must be Array'
+          }
+          break
+        case '$set':
+          pdata[pkey] = command[k]
+          break
+        case '$merge':
+          if (data instanceof Object) {
+            pdata[pkey] = { ...data, ...command[k] }
+          } else {
+            throw 'Must be Object'
+          }
+          break
+        case '$apply':
+          pdata[pkey] = command[k].call(null, data)
+          break
       }
-    })
-  } else {
-    
+    } else {
+      walk(data[k], command[k], data, k)
+    }
   }
+  return data
 }
 
-// update -> push {$push: array}
 const arr = [1, 2, 3, 4]
-const newArr = update(arr, { $push: [5, 6] })
+const newArr = update(arr, { 0: { $apply: (item) => item * 2 } })
 console.log(newArr)
