@@ -1,65 +1,71 @@
-const arr = [1, 2, 3, 4]
-
-arr.push(5) // 变为 [1, 2, 3, 4, 5]
-arr.pop() // 5, 数组变为 [1, 2, 3, 4]
-
 class Stack {
-  constructor(arr) {
-    this.data = arr || []
+  constructor() {
+    this._list = []
   }
 
   push(element) {
-    this.data.push(element)
+    this._list.push(element)
   }
 
   peek() {
-    return this.data.size ? this.data[this.data.size - 1] : null
+    return this.size() ? this._list[this.size() - 1] : null
   }
 
   pop() {
-    this.data.pop()
+    this._list.pop()
   }
 
   size() {
-    return this.data.length
+    return this._list.length
   }
 }
 
 class Queue {
-  constructor(arr) {
-    this.data = new Stack(arr)
+  constructor() {
+    this._list = []
+    this.stack = new Stack()
   }
 
   enqueue(element) {
-    this.data.push(element)
+    this._list.push(element)
+    this.stack.push(element)
   }
 
   peek() {
-    const data = new Stack(this.data), counter = 0, result = null
-    while (counter++ < data.size) {
-      result = data.peek()
-      data.dequeue()
+    let data = this.stack, counter = 0
+    while (counter++ < data.size() + 1) {
+      data.pop()
     }
-    return result
+    return data.peek()
   }
 
   dequeue() {
-    const remain = new Stack(), counter = 0
-    while (counter++ < data.size - 1) {
-      remain.push(this.data.dequeue())
+    let remain = new Stack(), counter = 0
+    debugger
+    while (counter++ < this.stack.size() - 1) {
+      remain.push(this.stack.peek())
+      console.log(remain.push)
     }
-    this.data.dequeue()
+    console.log('remain:', remain)
+    this.peek()
     counter = 0
-    while (counter++ < remain.size - 1) {
-      this.data.push(remain.pop())
+    while (counter++ < remain.size() - 1) {
+      this.push(remain.pop())
     }
   }
 
   size() {
-    return this.data.size()
+    return this._list.length
   }
 }
 
 const queue = new Queue()
-const result = queue.enqueue(1)
+queue.enqueue(1)
+queue.enqueue(2)
+queue.enqueue(3)
+queue.enqueue(4)
+let first = queue.peek()
+// console.log(first)
+queue.dequeue()
 console.log(queue)
+// console.log(queue.size())
