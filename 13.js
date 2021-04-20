@@ -27,35 +27,41 @@ class Queue {
   }
 
   enqueue(element) {
-    this._list.push(element)
     this.stack.push(element)
+    this._list = this.stack._list
   }
 
   peek() {
-    let data = this.stack, counter = 0
-    while (counter++ < data.size() + 1) {
-      data.pop()
+    let remain = new Stack(), result = null
+    while (this.stack.size() > 1) {
+      remain.push(this.stack.peek())
+      this.stack.pop()
     }
-    return data.peek()
+    result = this.stack.peek()
+    while (remain.size()) {
+      this.stack.push(remain.peek())
+      remain.pop()
+    }
+    console.log(result)
+    return result
   }
 
   dequeue() {
-    let remain = new Stack(), counter = 0
     debugger
-    while (counter++ < this.stack.size() - 1) {
+    let remain = new Stack(), result = new Stack
+    while (this.stack.size() > 1) {
       remain.push(this.stack.peek())
-      console.log(remain.push)
     }
-    console.log('remain:', remain)
-    this.peek()
-    counter = 0
-    while (counter++ < remain.size() - 1) {
-      this.push(remain.pop())
+    this.stack.pop()
+    while (remain.size()) {
+      result.push(remain.peek())
+      remain.pop()
     }
+    this._list = result
   }
 
   size() {
-    return this._list.length
+    return this.stack.size()
   }
 }
 
@@ -65,7 +71,7 @@ queue.enqueue(2)
 queue.enqueue(3)
 queue.enqueue(4)
 let first = queue.peek()
-// console.log(first)
+console.log(first)
 queue.dequeue()
 console.log(queue)
-// console.log(queue.size())
+console.log(queue.size())
