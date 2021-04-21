@@ -1,77 +1,63 @@
-class Stack {
-  constructor() {
-    this._list = []
-  }
+// class Stack {
+//   constructor() {
+//     this._list = []
+//   }
 
-  push(element) {
-    this._list.push(element)
-  }
+//   push(element) {
+//     this._list.push(element)
+//   }
 
-  peek() {
-    return this.size() ? this._list[this.size() - 1] : null
-  }
+//   peek() {
+//     return this.size() ? this._list[this.size() - 1] : null
+//   }
 
-  pop() {
-    this._list.pop()
-  }
+//   pop() {
+//     this._list.pop()
+//   }
 
-  size() {
-    return this._list.length
-  }
-}
+//   size() {
+//     return this._list.length
+//   }
+// }
 
 class Queue {
   constructor() {
-    this._list = []
-    this.stack = new Stack()
+    this.pushStack = new Stack()
+    this.popStack = new Stack()
+  }
+
+  _move() {
+    while (this.pushStack.size()) {
+      this.popStack.push(this.pushStack.pop())
+    }
   }
 
   enqueue(element) {
-    this.stack.push(element)
-    this._list = this.stack._list
+    this.pushStack.push(element)
   }
 
   peek() {
-    let remain = new Stack(), result = null
-    while (this.stack.size() > 1) {
-      remain.push(this.stack.peek())
-      this.stack.pop()
+    if (this.popStack.size()) {
+      return this.popStack.peek()
     }
-    result = this.stack.peek()
-    while (remain.size()) {
-      this.stack.push(remain.peek())
-      remain.pop()
+    if (this.pushStack.size()) {
+      this._move()
+      return this.popStack.peek()
     }
-    console.log(result)
-    return result
+    return undefined
   }
 
   dequeue() {
-    debugger
-    let remain = new Stack(), result = new Stack
-    while (this.stack.size() > 1) {
-      remain.push(this.stack.peek())
+    if (this.popStack.size()) {
+      return this.popStack.pop()
+    } else if (this.pushStack.size()) {
+      this._move()
+      return this.popStack.pop()
     }
-    this.stack.pop()
-    while (remain.size()) {
-      result.push(remain.peek())
-      remain.pop()
-    }
-    this._list = result
+    return undefined
   }
 
   size() {
-    return this.stack.size()
+    return this.pushStack.size() + this.popStack.size()
   }
 }
-
-const queue = new Queue()
-queue.enqueue(1)
-queue.enqueue(2)
-queue.enqueue(3)
-queue.enqueue(4)
-let first = queue.peek()
-console.log(first)
-queue.dequeue()
-console.log(queue)
-console.log(queue.size())
